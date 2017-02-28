@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<title>Export products</title>
+	</head>
+	<body>
+		<form method="POST">
+			{% csrf_token %}
+			<label><input type="checkbox" name="new_products">Only New products</label>
+			<hr>
+			<label><input type="checkbox" name="props[]" value="id" checked="checked">SKU</label><br>
+			<label><input type="checkbox" name="props[]" value="title" checked="checked">Title</label><br>
+			<label><input type="checkbox" name="props[]" value="price" checked="checked">Price</label><br>
+			<label><input type="checkbox" name="props[]" value="picture" checked="checked">Picture</label><br>
+			<label><input type="checkbox" name="props[]" value="rating" checked="checked">Rating</label><br>
+			<label><input type="checkbox" name="props[]" value="review_count" checked="checked">Review count</label><br>
+			<label><input type="checkbox" name="props[]" value="delivery_time" checked="checked">Delivery time</label><br>
+			<label><input type="checkbox" name="props[]" value="bullet_points" checked="checked">Bullet points</label><br>
+			<label><input type="checkbox" name="props[]" value="details" checked="checked">Details</label><br>
+
+			<input type="submit" name="" value="Export">
+			<input type="button" value="Back" class="main-btn" onclick="history.go(-1);">
+		</form>
+	</body>
+</html>
