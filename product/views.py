@@ -26,6 +26,8 @@ def export_products(request):
 
         for product in queryset:
             product_ = model_to_dict(product, fields=result_csv_fields)
+            if 'title' in result_csv_fields:
+                product_['title'] = product.title.encode('utf-8')
             if 'bullet_points' in result_csv_fields:
                 product_['bullet_points'] = product.bullet_points.encode('utf-8')
             if 'details' in result_csv_fields:
