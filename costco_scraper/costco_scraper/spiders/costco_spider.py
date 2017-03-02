@@ -22,14 +22,15 @@ class CostcoSpider(scrapy.Spider):
 
     def start_requests(self):
         categories = [
-            'alcohol-monitors',
-            'automatic-defibrillator',
-            'blood-pressure-health-monitors',
-            'electrical-muscle-stimulation',
-            'family-planning',
-            'home-health-care-first-aid',
-            'hot-cold-therapy',
-            'light-therapy'
+            # 'alcohol-monitors',
+            # 'automatic-defibrillator',
+            # 'blood-pressure-health-monitors',
+            # 'electrical-muscle-stimulation',
+            # 'family-planning',
+            # 'home-health-care-first-aid',
+            # 'hot-cold-therapy',
+            # 'light-therapy',
+            'usb-flash-drives'
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
@@ -62,14 +63,31 @@ class CostcoSpider(scrapy.Spider):
         request.meta['review_count'] = response.meta['reviewCount']
         request.meta['bullet_points'] = '\n'.join(response.css('ul.pdp-features li::text').extract())
         request.meta['delivery_time'] = response.css('p.primary-clause::text').extract_first()
-        yield request
+
+        description = '\n'.join(response.css('div.product-info-specs li::text').extract())
+
+        if description:
+            yield {
+                'id': request.meta['id'],
+                'title': request.meta['title'],
+                'price': request.meta['price'],
+                'picture': request.meta['picture'],
+                'rating': request.meta['rating'],
+                'review_count': request.meta['review_count'],
+                'delivery_time': request.meta['delivery_time'],
+                'bullet_points': request.meta['bullet_points'],
+                'details': description
+            }
+        else:
+            yield request
         
     def description(self, response):
-        description_ = re.search(r'\s*html:\s*"(.+?)"\s*}\s*};',response.body)
-        description = ''
-        if description_:
-            # description = re.compile(r'<[^>]+>').sub('', description_.group(1))
-            description = description_.group(1)
+        # description_ = re.search(r'\s*html:\s*"(.+?)"\s*}\s*};',response.body)
+        description = '\n'.join(response.css('div.product-info-specs li::text').extract())
+        # description = ''
+        # if description_:
+        #     # description = re.compile(r'<[^>]+>').sub('', description_.group(1))
+        #     description = description_.group(1)
 
         yield {
             'id': response.meta['id'],
