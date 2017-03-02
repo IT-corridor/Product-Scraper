@@ -9,7 +9,7 @@ class Product(models.Model):
     picture = models.CharField(max_length=250)
     rating = models.FloatField()
     review_count = models.IntegerField()
-    delivery_time = models.TextField()
+    delivery_time = models.TextField(null=True, blank=True)
     bullet_points = models.TextField()
     details = models.TextField()
 

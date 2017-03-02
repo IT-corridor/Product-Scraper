@@ -23,13 +23,13 @@ class CostcoSpider(scrapy.Spider):
     def start_requests(self):
         categories = [
             'alcohol-monitors',
-            # 'automatic-defibrillator',
-            # 'blood-pressure-health-monitors',
-            # 'electrical-muscle-stimulation',
-            # 'family-planning',
-            # 'home-health-care-first-aid',
-            # 'hot-cold-therapy',
-            # 'light-therapy',
+            'automatic-defibrillator',
+            'blood-pressure-health-monitors',
+            'electrical-muscle-stimulation',
+            'family-planning',
+            'home-health-care-first-aid',
+            'hot-cold-therapy',
+            'light-therapy',
             # 'usb-flash-drives'
         ]
 
