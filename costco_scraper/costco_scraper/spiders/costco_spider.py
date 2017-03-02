@@ -30,7 +30,8 @@ class CostcoSpider(scrapy.Spider):
             # 'home-health-care-first-aid',
             # 'hot-cold-therapy',
             # 'light-therapy',
-            'usb-flash-drives'
+            'usb-flash-drives',
+            'all-rings',
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
@@ -53,59 +54,26 @@ class CostcoSpider(scrapy.Spider):
         sel = Selector(response)
         pid = response.url[-14:-5]
         url = 'https://scontent.webcollage.net/costco/power-page?ird=true&channel-product-id=' + pid
+       
+        quantity = re.search(r'\s*"maxQty" : "(.+?)",',response.body)
+        quantity = quantity.group(1) if quantity else '0'
 
-        request = scrapy.Request(url, callback=self.description)
-        request.meta['id'] = response.css('p.item-number span::attr(data-sku)').extract_first()
-        request.meta['title'] = response.css('h1::text').extract_first()
-        request.meta['price'] = response.meta['price']
-        request.meta['picture'] = sel.xpath("//img[@id='initialProductImage']/@src").extract_first()
-        request.meta['rating'] = response.meta['rating']
-        request.meta['review_count'] = response.meta['reviewCount']
-        request.meta['bullet_points'] = '\n'.join(response.css('ul.pdp-features li::text').extract())
-        request.meta['delivery_time'] = response.css('p.primary-clause::text').extract_first()
-        request.meta['quantity'] = re.search(r'\s*"maxQty" : "(.+?)",',response.body).group(1) or '0'
-
-        des_key = response.css('div.product-info-specs li span::text').extract()
-        des_val = response.css('div.product-info-specs li::text').extract()
-        description = self.get_description(des_key, des_val)
-
-        if description:
-            yield {
-                'id': request.meta['id'],
-                'title': request.meta['title'],
-                'price': request.meta['price'],
-                'picture': request.meta['picture'],
-                'rating': request.meta['rating'],
-                'review_count': request.meta['review_count'],
-                'delivery_time': request.meta['delivery_time'],
-                'bullet_points': request.meta['bullet_points'],
-                'details': description,
-                'quantity': request.meta['quantity']
-            }
-        else:
-            yield request
-        
-    def description(self, response):
-        # description_ = re.search(r'\s*html:\s*"(.+?)"\s*}\s*};',response.body)
-        # if description_:
-        #     # description = re.compile(r'<[^>]+>').sub('', description_.group(1))
-        #     description = description_.group(1)
         des_key = response.css('div.product-info-specs li span::text').extract()
         des_val = response.css('div.product-info-specs li::text').extract()
         description = self.get_description(des_key, des_val)
 
         yield {
-            'id': response.meta['id'],
-            'title': response.meta['title'],
+            'id': response.css('p.item-number span::attr(data-sku)').extract_first(),
+            'title': response.css('h1::text').extract_first(),
             'price': response.meta['price'],
-            'picture': response.meta['picture'],
+            'picture': sel.xpath("//img[@id='initialProductImage']/@src").extract_first(),
             'rating': response.meta['rating'],
-            'review_count': response.meta['review_count'],
-            'delivery_time': response.meta['delivery_time'],
-            'bullet_points': response.meta['bullet_points'],
+            'review_count': response.meta['reviewCount'],
+            'delivery_time': response.css('p.primary-clause::text').extract_first(),
+            'bullet_points': '\n'.join(response.css('ul.pdp-features li::text').extract()),
             'details': description,
-            'quantity': response.meta['quantity']
-        }
+            'quantity': quantity
+        }        
 
     def get_description(self, des_key, des_val):
         description = ''
