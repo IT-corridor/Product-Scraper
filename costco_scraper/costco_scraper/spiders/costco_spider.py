@@ -22,7 +22,7 @@ class CostcoSpider(scrapy.Spider):
 
     def start_requests(self):
         categories = [
-            # 'alcohol-monitors',
+            'alcohol-monitors',
             # 'automatic-defibrillator',
             # 'blood-pressure-health-monitors',
             # 'electrical-muscle-stimulation',
@@ -30,7 +30,7 @@ class CostcoSpider(scrapy.Spider):
             # 'home-health-care-first-aid',
             # 'hot-cold-therapy',
             # 'light-therapy',
-            'usb-flash-drives'
+            # 'usb-flash-drives'
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
@@ -64,7 +64,9 @@ class CostcoSpider(scrapy.Spider):
         request.meta['bullet_points'] = '\n'.join(response.css('ul.pdp-features li::text').extract())
         request.meta['delivery_time'] = response.css('p.primary-clause::text').extract_first()
 
-        description = '\n'.join(response.css('div.product-info-specs li::text').extract())
+        des_key = response.css('div.product-info-specs li span::text').extract()
+        des_val = response.css('div.product-info-specs li::text').extract()
+        description = self.get_description(des_key, des_val)
 
         if description:
             yield {
@@ -83,11 +85,12 @@ class CostcoSpider(scrapy.Spider):
         
     def description(self, response):
         # description_ = re.search(r'\s*html:\s*"(.+?)"\s*}\s*};',response.body)
-        description = '\n'.join(response.css('div.product-info-specs li::text').extract())
-        # description = ''
         # if description_:
         #     # description = re.compile(r'<[^>]+>').sub('', description_.group(1))
         #     description = description_.group(1)
+        des_key = response.css('div.product-info-specs li span::text').extract()
+        des_val = response.css('div.product-info-specs li::text').extract()
+        description = self.get_description(des_key, des_val)
 
         yield {
             'id': response.meta['id'],
@@ -100,3 +103,11 @@ class CostcoSpider(scrapy.Spider):
             'bullet_points': response.meta['bullet_points'],
             'details': description
         }
+
+    def get_description(self, des_key, des_val):
+        description = ''
+        if des_key:
+            des_val = [item.strip() for item in des_val if item.strip()]
+            for idx in range(len(des_val)):
+                description += '{} {}\n'.format(des_key[idx].strip(), des_val[idx].strip())
+        return description.replace(',', '')
