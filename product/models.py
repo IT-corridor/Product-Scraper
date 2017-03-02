@@ -10,8 +10,9 @@ class Product(models.Model):
     rating = models.FloatField()
     review_count = models.IntegerField()
     delivery_time = models.TextField(null=True, blank=True)
-    bullet_points = models.TextField()
-    details = models.TextField()
+    bullet_points = models.TextField(null=True, blank=True)
+    details = models.TextField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return self.title
