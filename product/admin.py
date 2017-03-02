@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import *
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'price', 'rating']
+    list_display = ['title', 'price', 'quantity', 'rating']
     search_fields = ['title', 'bullet_points']
     actions = ['export_products']
 

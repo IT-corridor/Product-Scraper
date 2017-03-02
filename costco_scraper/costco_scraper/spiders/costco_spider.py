@@ -24,13 +24,13 @@ class CostcoSpider(scrapy.Spider):
         categories = [
             'alcohol-monitors',
             'automatic-defibrillator',
-            'blood-pressure-health-monitors',
-            'electrical-muscle-stimulation',
-            'family-planning',
-            'home-health-care-first-aid',
-            'hot-cold-therapy',
-            'light-therapy',
-            # 'usb-flash-drives'
+            # 'blood-pressure-health-monitors',
+            # 'electrical-muscle-stimulation',
+            # 'family-planning',
+            # 'home-health-care-first-aid',
+            # 'hot-cold-therapy',
+            # 'light-therapy',
+            'usb-flash-drives'
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
@@ -63,6 +63,7 @@ class CostcoSpider(scrapy.Spider):
         request.meta['review_count'] = response.meta['reviewCount']
         request.meta['bullet_points'] = '\n'.join(response.css('ul.pdp-features li::text').extract())
         request.meta['delivery_time'] = response.css('p.primary-clause::text').extract_first()
+        request.meta['quantity'] = re.search(r'\s*"maxQty" : "(.+?)",',response.body).group(1) or '0'
 
         des_key = response.css('div.product-info-specs li span::text').extract()
         des_val = response.css('div.product-info-specs li::text').extract()
@@ -78,7 +79,8 @@ class CostcoSpider(scrapy.Spider):
                 'review_count': request.meta['review_count'],
                 'delivery_time': request.meta['delivery_time'],
                 'bullet_points': request.meta['bullet_points'],
-                'details': description
+                'details': description,
+                'quantity': request.meta['quantity']
             }
         else:
             yield request
@@ -101,7 +103,8 @@ class CostcoSpider(scrapy.Spider):
             'review_count': response.meta['review_count'],
             'delivery_time': response.meta['delivery_time'],
             'bullet_points': response.meta['bullet_points'],
-            'details': description
+            'details': description,
+            'quantity': response.meta['quantity']
         }
 
     def get_description(self, des_key, des_val):

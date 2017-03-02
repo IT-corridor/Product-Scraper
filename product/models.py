@@ -12,6 +12,7 @@ class Product(models.Model):
     delivery_time = models.TextField(null=True, blank=True)
     bullet_points = models.TextField(null=True, blank=True)
     details = models.TextField(null=True, blank=True)
+    quantity = models.IntegerField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
