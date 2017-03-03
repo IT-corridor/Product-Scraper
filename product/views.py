@@ -43,5 +43,6 @@ def export_products(request):
         response['Content-Length'] = os.path.getsize( path ) # not FileField instance
         response['Content-Disposition'] = 'attachment; filename=%s/' % smart_str( os.path.basename( path ) ) # same here        
         return response
-
-    return render(request, 'product_properties.html')    
+    else:
+        fields = [f.name for f in Product._meta.get_fields() if f.name not in ['updated_at']]
+        return render(request, 'product_properties.html', locals())    
