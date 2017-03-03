@@ -5,7 +5,7 @@ from .models import *
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'price', 'quantity', 'min_quantity', 'rating', 
-    				'review_count', 'updated_at']
+    				'review_count', 'updated_at', 'special']
     search_fields = ['title', 'bullet_points']
     actions = ['export_products']
 

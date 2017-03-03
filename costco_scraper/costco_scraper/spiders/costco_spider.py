@@ -24,19 +24,20 @@ class CostcoSpider(scrapy.Spider):
 
     def start_requests(self):
         categories = [
-            'alcohol-monitors',
-            'automatic-defibrillator',
-            'blood-pressure-health-monitors',
-            'electrical-muscle-stimulation',
-            'family-planning',
-            'home-health-care-first-aid',
-            'hot-cold-therapy',
-            'light-therapy',
+            # 'alcohol-monitors',
+            # 'automatic-defibrillator',
+            # 'blood-pressure-health-monitors',
+            # 'electrical-muscle-stimulation',
+            # 'family-planning',
+            # 'home-health-care-first-aid',
+            # 'hot-cold-therapy',
+            # 'light-therapy',
             # 'usb-flash-drives',
             # '70-inch-tvs-and-above'
             # 'hd-ip-nvr-security-systems'
             # 'all-rings',
             # 'french-door-refrigerators',
+            'motor-oil',
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
@@ -88,6 +89,7 @@ class CostcoSpider(scrapy.Spider):
         des_key = response.css('div.product-info-specs li span::text').extract()
         des_val = response.css('div.product-info-specs li::text').extract()
         description = self.get_description(des_key, des_val)
+        special = sel.xpath("//div[@class='product-info-description']/div[contains(@style, 'text-align:center;')]/text()").extract_first()
 
         yield {
             'id': response.css('p.item-number span::attr(data-sku)').extract_first(),
@@ -102,6 +104,7 @@ class CostcoSpider(scrapy.Spider):
             'details': description,
             'quantity': quantity,
             'min_quantity': min_quantity,
+            'special': special
         }        
 
     def get_description(self, des_key, des_val):
