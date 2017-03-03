@@ -24,17 +24,17 @@ class CostcoSpider(scrapy.Spider):
 
     def start_requests(self):
         categories = [
-            # 'alcohol-monitors',
-            # 'automatic-defibrillator',
-            # 'blood-pressure-health-monitors',
-            # 'electrical-muscle-stimulation',
-            # 'family-planning',
-            # 'home-health-care-first-aid',
-            # 'hot-cold-therapy',
-            # 'light-therapy',
+            'alcohol-monitors',
+            'automatic-defibrillator',
+            'blood-pressure-health-monitors',
+            'electrical-muscle-stimulation',
+            'family-planning',
+            'home-health-care-first-aid',
+            'hot-cold-therapy',
+            'light-therapy',
             # 'usb-flash-drives',
             # '70-inch-tvs-and-above'
-            'hd-ip-nvr-security-systems'
+            # 'hd-ip-nvr-security-systems'
             # 'all-rings',
             # 'french-door-refrigerators',
         ]
@@ -47,11 +47,13 @@ class CostcoSpider(scrapy.Spider):
             price = product.css('div.price::text').extract_first()
             rating = product.xpath(".//meta[@itemprop='ratingValue']/@content").extract_first()
             reviewCount = product.xpath(".//meta[@itemprop='reviewCount']/@content").extract_first()
+            promo = product.css('p.promo::text').extract_first()
             
             if detail:
                 request = scrapy.Request(detail, headers=self.header, callback=self.detail)
                 request.meta['price'] = price
                 request.meta['rating'] = rating
+                request.meta['promo'] = promo
                 request.meta['reviewCount'] = reviewCount
                 yield request
 
@@ -62,6 +64,8 @@ class CostcoSpider(scrapy.Spider):
        
         quantity = re.search(r'\s*"maxQty" : "(.+?)",',response.body)
         quantity = quantity.group(1) if quantity else '0'
+        min_quantity = re.search(r'\s*"minQty" : "(.+?)",',response.body)
+        min_quantity = min_quantity.group(1) if min_quantity else '0'
 
         if int(quantity) == 9999:
             quantity = self.get_real_quantity({
@@ -92,10 +96,12 @@ class CostcoSpider(scrapy.Spider):
             'picture': sel.xpath("//img[@id='initialProductImage']/@src").extract_first(),
             'rating': response.meta['rating'],
             'review_count': response.meta['reviewCount'],
+            'promo': response.meta['promo'],
             'delivery_time': response.css('p.primary-clause::text').extract_first(),
             'bullet_points': '\n'.join(response.css('ul.pdp-features li::text').extract()),
             'details': description,
-            'quantity': quantity
+            'quantity': quantity,
+            'min_quantity': min_quantity,
         }        
 
     def get_description(self, des_key, des_val):
@@ -126,6 +132,10 @@ class CostcoSpider(scrapy.Spider):
         }
 
         res = requests.post(url=url, headers=header, data=body)
-        quantity_ = res.json()['orderErrMsgObj']['1']
+        try:
+            quantity_ = res.json()['orderErrMsgObj']['1']
+        except Exception, e:
+            print '==============================', res.json()['orderErrMsgObj']
+            return '9999'
         quantity = re.search(r'\s*only (.+?) are\s*', quantity_)
         return quantity.group(1) if quantity else '9999'
