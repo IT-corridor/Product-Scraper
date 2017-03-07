@@ -37,26 +37,35 @@ class CostcoSpider(scrapy.Spider):
             # 'hd-ip-nvr-security-systems'
             # 'all-rings',
             # 'french-door-refrigerators',
-            'motor-oil',
+            # 'motor-oil',
+            'furniture'
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
 
     def parse(self, response):
-        for product in response.css('div.product'):
-            detail = product.css('a.thumbnail::attr(href)').extract_first()
-            price = product.css('div.price::text').extract_first()
-            rating = product.xpath(".//meta[@itemprop='ratingValue']/@content").extract_first()
-            reviewCount = product.xpath(".//meta[@itemprop='reviewCount']/@content").extract_first()
-            promo = product.css('p.promo::text').extract_first()
-            
-            if detail:
-                request = scrapy.Request(detail, headers=self.header, callback=self.detail)
-                request.meta['price'] = price
-                request.meta['rating'] = rating
-                request.meta['promo'] = promo
-                request.meta['reviewCount'] = reviewCount
-                yield request
+        products = response.css('div.product')
+        cates = response.css('div.categoryclist div.col-md-3 a::attr(href)').extract()
+
+        if products:
+            for product in products:
+                detail = product.css('a.thumbnail::attr(href)').extract_first()
+                price = product.css('div.price::text').extract_first()
+                rating = product.xpath(".//meta[@itemprop='ratingValue']/@content").extract_first()
+                reviewCount = product.xpath(".//meta[@itemprop='reviewCount']/@content").extract_first()
+                promo = product.css('p.promo::text').extract_first()
+                
+                if detail:
+                    request = scrapy.Request(detail, headers=self.header, callback=self.detail)
+                    request.meta['price'] = price
+                    request.meta['rating'] = rating
+                    request.meta['promo'] = promo
+                    request.meta['reviewCount'] = reviewCount
+                    yield request
+        else:
+            for url in cates:
+                yield scrapy.Request(url, headers=self.header, callback=self.parse)
+
 
     def detail(self, response):
         sel = Selector(response)
@@ -138,7 +147,7 @@ class CostcoSpider(scrapy.Spider):
         try:
             quantity_ = res.json()['orderErrMsgObj']['1']
         except Exception, e:
-            print '==============================', res.json()['orderErrMsgObj']
+            print '==============================', res.json()
             return '9999'
         quantity = re.search(r'\s*only (.+?) are\s*', quantity_)
         return quantity.group(1) if quantity else '9999'
