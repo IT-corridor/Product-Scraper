@@ -54,12 +54,14 @@ class CostcoSpider(scrapy.Spider):
                 rating = product.xpath(".//meta[@itemprop='ratingValue']/@content").extract_first()
                 reviewCount = product.xpath(".//meta[@itemprop='reviewCount']/@content").extract_first()
                 promo = product.css('p.promo::text').extract_first()
-                
+                category = response.url[-23:-5]
+
                 if detail:
                     request = scrapy.Request(detail, headers=self.header, callback=self.detail)
                     request.meta['price'] = price
                     request.meta['rating'] = rating
                     request.meta['promo'] = promo
+                    request.meta['category'] = category
                     request.meta['reviewCount'] = reviewCount
                     yield request
         else:
@@ -108,6 +110,7 @@ class CostcoSpider(scrapy.Spider):
             'rating': response.meta['rating'],
             'review_count': response.meta['reviewCount'],
             'promo': response.meta['promo'],
+            'category': response.meta['category'],
             'delivery_time': response.css('p.primary-clause::text').extract_first(),
             'bullet_points': '\n'.join(response.css('ul.pdp-features li::text').extract()),
             'details': description,
