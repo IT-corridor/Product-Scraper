@@ -148,6 +148,8 @@ class CostcoSpider(scrapy.Spider):
             quantity_ = res.json()['orderErrMsgObj']['1']
         except Exception, e:
             print '==============================', res.json()
-            return '9999'
+            if 'errorMessage' in res.json():
+                return 0
+            return '9999'       # orderErrMsgObj
         quantity = re.search(r'\s*only (.+?) are\s*', quantity_)
         return quantity.group(1) if quantity else '9999'
