@@ -13,8 +13,8 @@ from product.models import *
 
 class CostcoScraperPipeline(object):
     def process_item(self, item, spider):
-    	try:
-        	Product.objects.update_or_create(id=item['id'], defaults=item)
-    	except Exception, e:
-    		pass
+        try:
+            Product.objects.update_or_create(id=item['id'], defaults=item)
+        except Exception, e:
+            pass
         return item

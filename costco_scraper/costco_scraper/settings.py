@@ -88,3 +88,22 @@ AUTOTHROTTLE_DEBUG = False
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+ALL_CATEGORIES = {
+    'electronics',
+    'computers',
+    'appliances',
+    'furniture',
+    'auto-tires',
+    'holiday-gifts',
+    'jewelry',
+    'patio-lawn-garden',
+    'hardware',
+    'home-and-decor',
+    'office-products',
+    'clothing',
+    'health-beauty',
+    'baby-kids',
+    'grocery-household',
+    'sports-fitness'  
+}

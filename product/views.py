@@ -2,6 +2,7 @@ import os
 import csv
 import datetime
 import mimetypes
+import scrapy
 
 from django.shortcuts import render
 from django.utils.encoding import smart_str
@@ -10,6 +11,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 
+from scrapy.crawler import CrawlerProcess
+
+from costco_scraper.costco_scraper.spiders.costco_spider import CostcoSpider
 from .models import *
 
 def export_products(request):
@@ -46,3 +50,11 @@ def export_products(request):
     else:
         fields = [f.name for f in Product._meta.get_fields() if f.name not in ['updated_at']]
         return render(request, 'product_properties.html', locals())    
+
+
+def run_scrapy(request):
+    process = CrawlerProcess()
+
+    process.crawl(MySpider)
+    process.start()
+    return HttpResponse('Scraper is completed successfully!')
