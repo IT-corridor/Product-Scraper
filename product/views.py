@@ -38,7 +38,6 @@ def export_products(request):
                 result_csv.writerow(product_)
             except Exception, e:
                 print product_
-                raise e
 
         result.close()
 
