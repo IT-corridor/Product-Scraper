@@ -18,8 +18,10 @@ from django.contrib import admin
 
 from product.views import *
 
+admin.site.site_header = 'Costco Products'
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^export_products/', export_products, name="export_products"),
+    url(r'^$', export_products, name="export_products"),
     url(r'^run_scrapy/', run_scrapy, name="run_scrapy"),
 ]

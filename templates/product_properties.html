@@ -11,7 +11,7 @@
 		<div class="page-header">
 		  	<h1>Export Costco Products</h1>
 		</div>		
-		<form method="POST" action="/export_products/">
+		<form method="POST" action="/">
 			{% csrf_token %}
 			<div class="row" style="margin-top: 30px;">
 				<h4>- Columns</h4>
@@ -44,7 +44,7 @@
 			</div>
 			<hr>
 			<input type="submit" class="btn btn-success" value="Export">
-			<input type="button" value="Back" class="btn btn-default" onclick="history.go(-1);">
+			<a href="/admin/product/product/" class="btn btn-default">See Product List</a>
 		</form>
 		</div>
 	</body>
