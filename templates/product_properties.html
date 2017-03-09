@@ -5,14 +5,16 @@
 		<title>Export products</title>
 	</head>
 	<body>
-		<form method="POST">
+		<form method="POST" action="/export_products/">
 			{% csrf_token %}
 			<label><input type="checkbox" name="new_products">Only New products</label>
 			<hr>
 			{% for item in fields %}
 				<label><input type="checkbox" name="props[]" value="{{ item }}" checked="checked">{{ item|title }}</label><br>
 			{% endfor %}
-
+			<textarea style="display:block; margin: 20px;" name="ids" cols="80" rows="15">
+				{{ ids }}
+			</textarea>
 			<input type="submit" name="" value="Export">
 			<input type="button" value="Back" class="main-btn" onclick="history.go(-1);">
 		</form>

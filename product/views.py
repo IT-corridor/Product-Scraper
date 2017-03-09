@@ -18,7 +18,7 @@ from .models import *
 
 def export_products(request):
     if request.method == "POST":
-        product_ids = request.GET.get('ids').split(',')
+        product_ids = request.POST.get('ids').split(',')
         result_csv_fields = request.POST.getlist('props[]')
 
         path = datetime.datetime.now().strftime("/tmp/.costco_products_%Y_%m_%d_%H_%M_%S.csv")
@@ -49,10 +49,6 @@ def export_products(request):
         response['Content-Length'] = os.path.getsize( path ) # not FileField instance
         response['Content-Disposition'] = 'attachment; filename=%s/' % smart_str( os.path.basename( path ) ) # same here        
         return response
-    else:
-        fields = [f.name for f in Product._meta.get_fields() if f.name not in ['updated_at']]
-        return render(request, 'product_properties.html', locals())    
-
 
 def run_scrapy(request):
     process = CrawlerProcess()
