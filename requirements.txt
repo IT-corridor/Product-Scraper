@@ -1,4 +1,4 @@
 Django==1.9.7
 scrapy
 requests
-django-celery
+celery
