@@ -11,10 +11,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.conf import settings
 
-from scrapy.crawler import CrawlerProcess
-
-from costco_scraper.costco_scraper.spiders.costco_spider import CostcoSpider
+from costco_scraper.celery_crawler import scrape_module
 from .models import *
 
 
@@ -64,8 +63,6 @@ def export_products(request):
 
 
 def run_scrapy(request):
-    process = CrawlerProcess()
-
-    process.crawl(MySpider)
-    process.start()
+    path = settings.BASE_DIR+'/costco_scraper/'
+    os.system("python {}celery_crawler.py 123,324".format(path))
     return HttpResponse('Scraper is completed successfully!')

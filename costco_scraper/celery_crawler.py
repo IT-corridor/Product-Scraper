@@ -1,8 +1,8 @@
-from twisted.internet import reactor
+# from twisted.internet import reactor
+# from threading import Thread
+import sys
 
 from scrapy.utils.project import get_project_settings
-from threading import Thread
-
 from scrapy.crawler import CrawlerProcess
 from costco_scraper.spiders.costco_spider import CostcoSpider
 # from lostpet.database import getClients
@@ -51,8 +51,10 @@ def scrape_module():
     params = ['usb-flash-drives']
     crawler = CrawlerProcess(get_project_settings())
     crawler.crawl(CostcoSpider, param=params)
-    Thread(target=crawler.start)
-    reactor.run()
+    crawler.start()
+    # Thread(target=crawler.start)
+    # reactor.run()
 
 if __name__=='__main__':
+    print sys.argv[1], '@@@@@@@@2'
     scrape_module()

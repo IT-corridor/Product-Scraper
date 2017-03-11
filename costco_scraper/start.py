@@ -11,8 +11,8 @@ app = Celery('tasks', backend='amqp',
              broker='amqp://guest@localhost//')
 
 
-@periodic_task(run_every=timedelta(hours=2))
-def lost_pet():
+@periodic_task(run_every=timedelta(minutes=1))
+def scrape_costco():
     print "start"
-    os.system("python celery_crawler.py")
+    os.system("python celery_crawler.py ALL")
     return;
