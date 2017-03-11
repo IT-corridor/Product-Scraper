@@ -21,6 +21,7 @@
 	apt-get install rabbitmq-server
 
 #### Run celery:
+	export C_FORCE_ROOT="true"
 	celery worker -l info -A start --beat
 
 #### Kill workers:
