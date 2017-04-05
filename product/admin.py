@@ -8,7 +8,7 @@ from .models import *
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'price', 'quantity', 'min_quantity', 
                     'rating', 'review_count', 'updated_at']
-    search_fields = ['title', 'bullet_points']
+    search_fields = ['title', 'bullet_points', 'id']
     actions = ['export_products']
     list_filter = ('category',)
 
