@@ -13,7 +13,8 @@
 	python manage createsuperuser
 
 #### Run the project:
-	nohup python manage.py runserver 0.0.0.0:80 </dev/null &
+	cd Product-Scraper/
+	nohup python manage.py runserver 0.0.0.0:80 < /dev/null &
 
 #### Install RabbitMQ
 

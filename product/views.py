@@ -34,9 +34,6 @@ def export_products(request):
         else:
             queryset = Product.objects.filter(id__in=product_ids)
 
-        if new_products:
-            pass
-            
         for product in queryset:
             product_ = model_to_dict(product, fields=result_csv_fields)
             for key, val in product_.items():

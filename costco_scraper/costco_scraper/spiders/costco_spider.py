@@ -26,35 +26,23 @@ class CostcoSpider(scrapy.Spider):
         self.param = param
 
     def start_requests(self):
-        print self.param, '@@@@@@@@@@@'
         categories = [
-            # 'alcohol-monitors',
-            # 'automatic-defibrillator',
-            # 'blood-pressure-health-monitors',
-            # 'electrical-muscle-stimulation',
-            # 'family-planning',
-            # 'home-health-care-first-aid',
-            # 'hot-cold-therapy',
-            # 'light-therapy',
-            'usb-flash-drives',
-            # '70-inch-tvs-and-above'
-            # 'hd-ip-nvr-security-systems'
-            # 'all-rings',
-            # 'french-door-refrigerators',
-            # 'motor-oil',
-            # 'appliances'
-            # 'auto-tires',
-            # 'holiday-gifts',
-            # 'jewelry',
-            # 'patio-lawn-garden',
-            # 'hardware',
-            # 'home-and-decor',
-            # 'office-products',
-            # 'clothing',
-            # 'health-beauty',
-            # 'baby-kids',
-            # 'grocery-household',
-            # 'sports-fitness'              
+            'electronics',
+            'computers',
+            'appliances',
+            'furniture',
+            'auto-tires',
+            'holiday-gifts',
+            'jewelry',
+            'patio-lawn-garden',
+            'hardware',
+            'home-and-decor',
+            'office-products',
+            'clothing',
+            'health-beauty',
+            'baby-kids',
+            'grocery-household',
+            'sports-fitness'  
         ]
 
         return [scrapy.Request('https://www.costco.com/{}.html'.format(item), headers=self.header, callback=self.parse) for item in categories]
