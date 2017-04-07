@@ -1,5 +1,8 @@
 *.pyc
-*.sqlite3
+*.sqlite3*
 config.py
 migrations
 celerybeat-schedule
+ghostdriver.log
+nohup.out
+media/
