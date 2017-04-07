@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
 
+import os
+import subprocess
+
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
@@ -25,6 +28,7 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.title
+
 
 class Category(models.Model):    
     url = models.CharField(max_length=100, primary_key=True)
@@ -98,4 +102,3 @@ class ScrapyTask(models.Model):
                           path, 
                           str(self.pk)])
 
-        
