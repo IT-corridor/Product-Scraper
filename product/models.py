@@ -48,7 +48,6 @@ class Category(models.Model):
                 r.extend(_r)
         return r
 
-
 MODE = (
     (1, 'Category'),
     (2, 'Products')

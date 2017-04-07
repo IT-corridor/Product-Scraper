@@ -120,5 +120,8 @@ def get_category_products(category, attr='url'):
 
 
 def set_old_category_products(category):
+    """
+    Set is_new flag False for existing products for the category
+    """
     for cate in category.get_all_children():
         Product.objects.filter(category=cate).update(is_new=False)
