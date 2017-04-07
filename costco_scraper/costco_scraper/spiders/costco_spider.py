@@ -46,29 +46,21 @@ class CostcoSpider(scrapy.Spider):
         elif self.task.mode == 2:
             products = self.task.products.replace('\n', ',')
             products_ = [int(item) for item in products.split(',')]
-            self.products = Product.objects.filter(id__in=products_)
+            qs = Product.objects.filter(id__in=products_)
+            self.products = [item.url for item in qs]
+            self.categories = [item.category for item in qs]
 
     def start_requests(self):
-        if self.task.mode == 1:
-            cate_requests = []
-            for item in self.categories:
-                request = scrapy.Request('https://www.costco.com/{}.html'.format(item),
-                                         headers=self.header,  
-                                         callback=self.parse)
-                request.meta['category'] = item
-                # request.meta['proxy'] = 'http://'+random.choice(self.proxy_pool)
-                cate_requests.append(request)
-            return cate_requests
-        else:
-            product_requests = []
-            for product in self.products:
-                request = scrapy.Request(product.url, 
-                                         headers=self.header, 
-                                         callback=self.detail)
-                request.meta['model_num'] = product.special
-                request.meta['category'] = product.category_id
-                product_requests.append(request)
-            return product_requests
+        cate_requests = []
+        for item in self.categories:
+            request = scrapy.Request('https://www.costco.com/{}.html'.format(item),
+                                     headers=self.header,  
+                                     callback=self.parse)
+            request.meta['category'] = item
+            # request.meta['proxy'] = 'http://'+random.choice(self.proxy_pool)
+            cate_requests.append(request)
+        return cate_requests
+    
 
     def closed(self, reason):
         self.update_run_time()
@@ -77,29 +69,46 @@ class CostcoSpider(scrapy.Spider):
 
     def parse(self, response):
         products = response.css('div.product')
-        cates = response.css('div.categoryclist div.col-md-3 a::attr(href)').extract()
+        cates_url = response.css('div.categoryclist div.col-md-3 a::attr(href)').extract()
+        cates_title = response.css('div.categoryclist div.col-md-3 a::attr(title)').extract()
 
         if products:
             for product in products:
                 detail = product.css('a.thumbnail::attr(href)').extract_first()
-                price = product.css('div.price::text').extract_first()
-                rating = product.xpath(".//meta[@itemprop='ratingValue']/@content").extract_first()
-                reviewCount = product.xpath(".//meta[@itemprop='reviewCount']/@content").extract_first()
-                promo = product.css('p.promo::text').extract_first()
-                category = response.url[23:-5]
 
                 if detail:
-                    request = scrapy.Request(detail, headers=self.header, callback=self.detail)
-                    request.meta['price'] = price
-                    request.meta['rating'] = rating
-                    request.meta['promo'] = promo
-                    request.meta['category'] = category
-                    request.meta['reviewCount'] = reviewCount
-                    yield request
-        else:
-            for url in cates:
-                yield scrapy.Request(url, headers=self.header, callback=self.parse)
+                    url_id = self.get_url_id(detail)
 
+                    if self.task.mode == 1 or self.task.mode == 2 and str(url_id) in self.products:
+                        price = product.css('div.price::text').extract_first()
+                        rating = product.xpath(".//meta[@itemprop='ratingValue']/@content").extract_first()
+                        reviewCount = product.xpath(".//meta[@itemprop='reviewCount']/@content").extract_first()
+                        promo = product.css('p.promo::text').extract_first()
+                        category = response.url[23:-5]
+
+                        request = scrapy.Request(detail, headers=self.header, callback=self.detail)
+                        request.meta['price'] = price
+                        request.meta['rating'] = rating
+                        request.meta['promo'] = promo
+                        request.meta['category'] = category
+                        request.meta['reviewCount'] = reviewCount
+                        yield request
+        else:
+            parent = response.meta['category']
+            for item in zip(cates_url, cates_title):
+                try:
+                    Category.objects.create(parent_id=parent, url=item[0][23:-5], title=item[1])
+                except Exception, e:
+                    print str(e)
+
+                request = scrapy.Request(item[0], headers=self.header, callback=self.parse)
+                request.meta['category'] = item[0][23:-5]
+                # request.meta['proxy'] = 'http://'+random.choice(self.proxy_pool)
+                yield request
+
+    def get_url_id(self, url):
+        url_id = re.search(r'.*\.product\.(\d+?)\.html', url)
+        return url_id.group(1)
 
     def detail(self, response):
         sel = Selector(response)
@@ -148,7 +157,8 @@ class CostcoSpider(scrapy.Spider):
             'details': description,
             'quantity': quantity,
             'min_quantity': min_quantity,
-            'special': special
+            'special': special,
+            'url': self.get_url_id(response.url)
         }        
 
     def get_description(self, des_key, des_val):
