@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.conf import settings
+from django.core.validators import MinValueValidator
 
 class Product(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -18,6 +20,8 @@ class Product(models.Model):
     quantity = models.IntegerField()
     min_quantity = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
+    url = models.CharField(max_length=200)
+    is_new = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.title
@@ -89,7 +93,7 @@ class ScrapyTask(models.Model):
         self.update()
 
     def run_scraper(self):
-        path = settings.BASE_DIR + '/samsclub_scraper/celery_crawler.py'
+        path = settings.BASE_DIR + '/costco_scraper/celery_crawler.py'
         subprocess.Popen(["python", 
                           path, 
                           str(self.pk)])
