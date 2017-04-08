@@ -16,11 +16,6 @@
 	cd Product-Scraper/
 	nohup python manage.py runserver 0.0.0.0:80 < /dev/null &
 
-#### Install RabbitMQ
+#### Edit crontab
 
-	apt-get update
-	apt-get install rabbitmq-server
-
-#### Kill workers:
-	ps aux|grep 'celery worker'
-	kill <pid>s
+	* * * * * python /root/Product-Scraper/cron_task.py
