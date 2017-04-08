@@ -29,10 +29,6 @@ class CostcoSpider(scrapy.Spider):
         'AUTOTHROTTLE_DEBUG': False
     }
 
-    header = {
-        # 'User-Agent': 'costco_scraper (+http://www.yourdomain.com)'
-    }
-
     def __init__(self, task_id):
         self.task = ScrapyTask.objects.get(id=int(task_id))
 
@@ -53,7 +49,6 @@ class CostcoSpider(scrapy.Spider):
         cate_requests = []
         for item in self.categories:
             request = scrapy.Request('https://www.costco.com/{}.html'.format(item),
-                                     headers=self.header,  
                                      callback=self.parse)
             request.meta['category'] = item
             # request.meta['proxy'] = 'http://'+random.choice(self.proxy_pool)
@@ -85,7 +80,7 @@ class CostcoSpider(scrapy.Spider):
                         promo = product.css('p.promo::text').extract_first()
                         category = response.url[23:-5]
 
-                        request = scrapy.Request(detail, headers=self.header, callback=self.detail)
+                        request = scrapy.Request(detail, callback=self.detail)
                         request.meta['price'] = price
                         request.meta['rating'] = rating
                         request.meta['promo'] = promo
@@ -100,7 +95,7 @@ class CostcoSpider(scrapy.Spider):
                 except Exception, e:
                     print str(e)
 
-                request = scrapy.Request(item[0], headers=self.header, callback=self.parse)
+                request = scrapy.Request(item[0], callback=self.parse)
                 request.meta['category'] = item[0][23:-5]
                 # request.meta['proxy'] = 'http://'+random.choice(self.proxy_pool)
                 yield request

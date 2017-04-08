@@ -6,7 +6,7 @@
 	pip install -r requirements.txt
 
 #### Migrate the database:
-	python manage makemigrations
+	python manage makemigrations product
 	python manage migrate
 
 #### Create a superuser
@@ -16,6 +16,6 @@
 	cd Product-Scraper/
 	nohup python manage.py runserver 0.0.0.0:80 < /dev/null &
 
-#### Edit crontab
+#### Edit crontab entry
 
 	* * * * * python /root/Product-Scraper/cron_task.py
