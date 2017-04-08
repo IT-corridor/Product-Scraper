@@ -19,7 +19,7 @@ class Product(models.Model):
     details = models.TextField(null=True, blank=True)
     promo = models.TextField(null=True, blank=True)
     special = models.TextField(null=True, blank=True)
-    category = models.CharField(max_length=50, null=True, blank=True)
+    category = models.ForeignKey('Category')
     quantity = models.IntegerField()
     min_quantity = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
