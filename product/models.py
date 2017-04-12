@@ -48,6 +48,9 @@ class Category(models.Model):
                 r.extend(_r)
         return r
 
+    class Meta:
+        verbose_name_plural = "categories"
+
 MODE = (
     (1, 'Category'),
     (2, 'Products')
